@@ -1,0 +1,23 @@
+GOALS:
+graph each instance of the object
+each pointer is a reference to an object
+each "thing" has this basic structure
+
+struct thing {
+	string name
+	int type
+	ArrayList<thing> connected[]
+}
+
+each different type has its own color and shape to make it more readable
+
+
+FAR REACHING GOALS:
+1) possibly make it dynamic (real time analysis)
+2) thicker border for more memory
+3) add "click through" functionality
+	- click on an item to recieve more details
+	- address in memory
+	- connected data addresses
+	- memory allocation size
+
