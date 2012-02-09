@@ -6,4 +6,4 @@
 -Have 2 people work on the graphics and the outputs
 --Pull data from main and figure out how the graphics should be displayed
 --Which graphics should be used, where do variable names go, padding 
-between each variable, etc
+dddsaZZZZ
