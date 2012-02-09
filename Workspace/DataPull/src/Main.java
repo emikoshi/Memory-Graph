@@ -36,16 +36,16 @@ public class Main {
 
 		// create a list of AttachingConnectors to choose which one to connect to 
 		List<AttachingConnector> attaching_connectors_list = first.attachingConnectors();
-		//List<Connector> connectors_list = first.allConnectors();
+		List<Connector> connectors_list = first.allConnectors();
 		
 		// display the AttachingConnectors list
-		//System.out.println("attachingConnectors / their names");
-		//for (AttachingConnector i:attaching_connectors_list) System.out.println(i + " \n name: " + i.name());
-		//System.out.println();
+		System.out.println("attachingConnectors / their names");
+		for (AttachingConnector i:attaching_connectors_list) System.out.println(i + " \n name: " + i.name());
+		System.out.println();
 		
-//		System.out.println("allConnectors / their names");
-//		for (Connector i:connectors_list) System.out.println(i + " \n name: " + i.name());
-//		System.out.println();
+		//System.out.println("allConnectors / their names");
+		//for (Connector i:connectors_list) System.out.println(i + " \n name: " + i.name());
+		//System.out.println();
 		
 		
 		// let's assume we want to attach to the SocketAttach connector ... 
@@ -63,7 +63,9 @@ public class Main {
 				Connector.IntegerArgument arg = (Connector.IntegerArgument)default_connector_map.get("port");
 				arg.setValue(port);
 				
-				try {					
+				
+				try {			
+					System.out.println(default_connector_map);
 					// when we've finished this part, a virtual machine is returned 
 					return i.attach(default_connector_map);
 				} catch (IOException e) {

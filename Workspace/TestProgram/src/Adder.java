@@ -8,7 +8,9 @@ public class Adder {
 		BufferedReader reader; 
 		
 		int z = x + y;
-		reader = new BufferedReader(new InputStreamReader(System.in)); 
-		name = reader.readLine(); 
+		System.out.println(z);
+		System.in.read();
+		//reader = new BufferedReader(new InputStreamReader(System.in)); 
+		//name = reader.readLine(); 
 	}
 }
