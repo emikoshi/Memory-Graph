@@ -2,10 +2,11 @@ import java.io.*;
 
 public class Adder {
 	public static void main(String args[]) throws IOException {
-		int x = 5;
-		int y = 6;
+		Integer x = 5;
+		Integer y = 6;
 		String name; 
 		BufferedReader reader; 
+		int[] arr = {15, 15, 15, 15, 15, 16, 17};
 		
 		int z = x + y;
 		System.out.println(z);
