@@ -1,98 +1,95 @@
-package src;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import sun.tools.java.Type;
-
 import com.sun.jdi.AbsentInformationException;
 import com.sun.jdi.ArrayReference;
-import com.sun.jdi.ArrayType;
+import com.sun.jdi.BooleanValue;
 import com.sun.jdi.Bootstrap;
+import com.sun.jdi.ByteValue;
+import com.sun.jdi.CharValue;
 import com.sun.jdi.ClassLoaderReference;
-import com.sun.jdi.ClassNotLoadedException;
 import com.sun.jdi.ClassObjectReference;
-import com.sun.jdi.ClassType;
+import com.sun.jdi.DoubleValue;
 import com.sun.jdi.Field;
+import com.sun.jdi.FloatValue;
 import com.sun.jdi.IncompatibleThreadStateException;
-import com.sun.jdi.IntegerType;
 import com.sun.jdi.IntegerValue;
 import com.sun.jdi.LocalVariable;
+import com.sun.jdi.LongValue;
 import com.sun.jdi.ObjectReference;
-import com.sun.jdi.PrimitiveType;
 import com.sun.jdi.PrimitiveValue;
+import com.sun.jdi.ShortValue;
 import com.sun.jdi.StackFrame;
 import com.sun.jdi.StringReference;
 import com.sun.jdi.Value;
 import com.sun.jdi.VirtualMachine;
 import com.sun.jdi.VirtualMachineManager;
+import com.sun.jdi.VoidValue;
 import com.sun.jdi.connect.AttachingConnector;
 import com.sun.jdi.connect.Connector;
 import com.sun.jdi.connect.IllegalConnectorArgumentsException;
-import com.sun.jdi.connect.Connector.Argument;
 import com.sun.jdi.ThreadReference;
 import com.sun.jdi.ReferenceType;
-import com.sun.xml.internal.xsom.impl.scd.Iterators.Map;
 
 public class Main {
 	
-	// java -Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n <Classname>
+	//Make sure to compile before, running the JVM
+	//java -Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n <Classname>
 	
 	public static void main (String args[]) {
-		// get the virtual machine from create_vm with the specified parameters
+		//get the virtual machine from create_vm with the specified parameters
 		VirtualMachine target_vm = create_vm("com.sun.jdi.SocketAttach", 8000);
-		
-		// do stuff with the vm
-		print_vm_contents(target_vm);
+	
+		//Printing out the contents of the VM, however; is not needed this far into the project.
+		//print_vm_contents(target_vm);
 		System.out.println("\nStarting to store contents...");
-		ContentStructure cs = store_vm_contents(target_vm);
-		
 		System.out.println("\nPrinting the ContentStructure we gathered from the VM...");
 		
+		ContentStructure cs = store_vm_contents(target_vm);
 		print_content_structure(cs,"");
 	}
 
 	private static VirtualMachine create_vm(String connectorName, int port) {
-		// first, get the virtual machine
-		
-		// first thing we must do is create the Bootstrap virtual machine manager
-		// this will allow us to connect to the virtual machine running the target program
-		// and the debugger associated with the target program.
-		VirtualMachineManager first = Bootstrap.virtualMachineManager();
+		//Grab the virtual machine and create the Bootstrap virtual machine manager.
+		//It will allow us to connect to the virtual machine running the target program
+		//and the debugger associated with the target program.
+		VirtualMachineManager CreateBoot = Bootstrap.virtualMachineManager();
 
-		// create a list of AttachingConnectors to choose which one to connect to 
-		List<AttachingConnector> attaching_connectors_list = first.attachingConnectors();
-		List<Connector> connectors_list = first.allConnectors();
+		//Create a list of AttachingConnectors to choose which one to connect to 
+		List<AttachingConnector> attaching_connectors_list = CreateBoot.attachingConnectors();
 		
-		// display the AttachingConnectors list
-		System.out.println("attachingConnectors / their names");
-		for (AttachingConnector i:attaching_connectors_list) System.out.println(i + " \n name: " + i.name());
-		System.out.println();
-		
+		//Commented this out because it was purely used for debugging. Its purpose
+		//was to display the AttachingConnectors list to see what connector we should use.
+		//List<Connector> connectors_list = CreateBoot.allConnectors();
+		//System.out.println("attachingConnectors / their names");
+		//for (AttachingConnector i:attaching_connectors_list) System.out.println(i + " \n name: " + i.name());
+		//System.out.println();
 		//System.out.println("allConnectors / their names");
 		//for (Connector i:connectors_list) System.out.println(i + " \n name: " + i.name());
 		//System.out.println();
 		
 		
-		// let's assume we want to attach to the SocketAttach connector ... 
+		//This is used in order to attach to the SocketAttach Connector
 		for (AttachingConnector i:attaching_connectors_list) {
-			// if the current AttachingConnector i has the name "com.sun.jdi.SocketAttach"
+			//If the current AttachingConnector i has the name "com.sun.jdi.SocketAttach"
 			if (i.name().equals(connectorName)) {
-				// output to confirm
-				System.out.println("Attaching to... " + i.name());
+				//Output to confirm, used for debugging
+				//System.out.println("Attaching to... " + i.name());
 			
-				// set a map default_connector_map equal to the default Connector map, output the values
+				//Set a map default_connector_map equal to the default Connector map, output the values.
+				//Again used for debugging.
 				java.util.Map<String, Connector.Argument> default_connector_map = i.defaultArguments();
-				System.out.println(default_connector_map.values());
+				
+				//Printed out the connector map's default values, used for debugging.
+				//System.out.println(default_connector_map.values());
 
-				// set the port to 8000 (we should avoid using magic numbers in the future)
+				//Setting the port to 8000, the same as is used in terminal to start up the JVM
 				Connector.IntegerArgument arg = (Connector.IntegerArgument)default_connector_map.get("port");
 				arg.setValue(port);
 				
-				
-				try {			
-					System.out.println(default_connector_map);
+				try {
+					//Used to print the new connector map of SocketAttach, purely debugging.
+					//System.out.println(default_connector_map);
 					// when we've finished this part, a virtual machine is returned 
 					return i.attach(default_connector_map);
 				} catch (IOException e) {
@@ -106,6 +103,9 @@ public class Main {
 		}
 		return null;
 	}
+	
+//Commented the print of this function out in main because it was used to get the raw values
+//of the VM, but really only needed for debugging.
 	private static void print_vm_contents(VirtualMachine target_vm) {
 		// TODO Auto-generated method stub
 		System.out.println("Now printing all threads..");
@@ -135,73 +135,99 @@ public class Main {
 		}
 	}
 	
-	/* ContentStructure method 
-	 * this method returns a ContentStructure containing all of the threads, stacks, and variables within this program
-	 * possible problems: infinite loop if there is a cycle in the graph (a sequence of nodes that point to each other).
-	 */
-	@SuppressWarnings("null")
+	//This method returns a ContentStructure containing all of the threads, stacks, and variables within this program
+	//Possible problems: infinite loop if there is a cycle in the graph (a sequence of nodes that point to each other).
 	private static ContentStructure store_vm_contents(VirtualMachine target_vm) {
 		ContentStructure head = new ContentStructure("Base", null, "head", (long)0, new ArrayList<ContentStructure>(), target_vm);
 		
-		for (ThreadReference current_tr:target_vm.allThreads()) {
-			current_tr.suspend();
-			if (!(current_tr.name().equals("Reference Handler") || current_tr.name().equals("Finalizer") || current_tr.name().equals("Signal Dispatcher"))) {
-				ContentStructure new_thread_cs = new ContentStructure(current_tr.name(), null, "thread", current_tr.uniqueID(), new ArrayList<ContentStructure>(), current_tr);				
+		for (ThreadReference i:target_vm.allThreads()) {
+			i.suspend();
+			if (!(i.name().equals("Reference Handler") || i.name().equals("Finalizer") || i.name().equals("Signal Dispatcher"))) {
+				ContentStructure new_thread_cs = new ContentStructure(i.name(), null, "thread", i.uniqueID(), new ArrayList<ContentStructure>(), i);				
 				head.contents.add(new_thread_cs);
-				// here we might want to say that new_thread_cs is pointed to BY head, like another array to hold that data
+				//Here we might want to say that new_thread_cs is pointed to BY head, like another array to hold that data
 				
 				int stack_number = 0;
 				try {
-					for (StackFrame current_stack:current_tr.frames()) {						
-						StackStructure new_stack_cs = new StackStructure(current_stack.toString(), null, "stack_frame", (long)stack_number, new ArrayList<ContentStructure>(), current_stack, current_tr.frames().indexOf(current_stack));
+					for (StackFrame j:i.frames()) {						
+						ContentStructure new_stack_cs = new ContentStructure(j.toString(), null, "stack_frame", (long)stack_number, new ArrayList<ContentStructure>(), j);
 						stack_number++;
 						new_thread_cs.contents.add(new_stack_cs);
 						try {
-							for (LocalVariable current_localvar:current_stack.visibleVariables()) {
-								Value v = current_stack.getValue(current_localvar);
-								ObjectReference ob = null;
-								//System.out.println(v);
-								ob = ((ObjectReference) v);
-								ReferenceType reft = ob.referenceType();
-								System.out.println("referencet type="+reft);
-								List<Field> farr = reft.allFields();
+							for (LocalVariable k:j.visibleVariables()) {
+								Value v = j.getValue(k);
+								if (v instanceof PrimitiveValue){
+									PrimitiveValue pv = null;
+									pv = ((PrimitiveValue) v);
+									if (pv instanceof BooleanValue){
+										System.out.println(k.name()+" is a PrimitiveValue. Its type is BooleanValue, with a value of: "+pv.booleanValue());
+									}
+									if (pv instanceof ByteValue){
+										System.out.println(k.name()+" is a PrimitiveValue. Its type is ByteValue, with a value of: "+pv.byteValue());
+									}
+									if (pv instanceof CharValue){
+										System.out.println(k.name()+" is a PrimitiveValue. Its type is CharValue, with a value of: "+pv.charValue());
+									}
+									if (pv instanceof DoubleValue){
+										System.out.println(k.name()+" is a PrimitiveValue. Its type is DoubleValue, with a value of: "+pv.doubleValue());
+									}
+									if (pv instanceof FloatValue){
+										System.out.println(k.name()+" is a PrimitiveValue. Its type is FloatValue, with a value of: "+pv.floatValue());
+									}
+									if (pv instanceof IntegerValue){
+										System.out.println(k.name()+" is a PrimitiveValue. Its type is IntegerValue, with a value of: "+pv.intValue());
+									}
+									if (pv instanceof LongValue){
+										System.out.println(k.name()+" is a PrimitiveValue. Its type is LongValue, with a value of: "+pv.longValue());
+									}
+									if (pv instanceof ShortValue){
+										System.out.println(k.name()+" is a PrimitiveValue. Its type is ShortValue, with a value of: "+pv.shortValue());
+									}
+									if (pv instanceof VoidValue){
+										System.out.println(k.name()+" is a PrimitiveValue. Its type is VoidValue, and is...VOID");
+									}	
+								}
 								
 								if (v instanceof ObjectReference){
-							
-									//System.out.println(v.type().name() +" is an object");
-
+									System.out.println(((ObjectReference) v).uniqueID());
+									ObjectReference ob = null;
+									ob = ((ObjectReference) v);
+									ReferenceType reft = ob.referenceType();
+									List<Field> flist = reft.fields();
+									System.out.println(k.name() + " is a reference of " + reft.name());
+									System.out.println(k.name() + " = "+ob.getValues(flist));
 									if (ob instanceof ArrayReference){
-										//System.out.println("ARRRRR");
-										System.out.println(current_localvar.name());
-										System.out.println(((ArrayReference) ob).getValues());
-										System.out.println("----");
+										List<Value> lolarr = ((ArrayReference) ob).getValues();
+										Object[] listarr = lolarr.toArray();
+										if (listarr.length < 1){
+											System.out.println(((ArrayReference) ob).getValues());
+										}
+										else{
+											for (int u=0; u<listarr.length; u++){
+												System.out.println("Element " + u + " of "+k.name()+ " = "+ listarr[u]);
+											}
+										}
 									}
 									if (ob instanceof StringReference){
-										//System.out.println("ARRRRR");
-										System.out.println(current_localvar.name());
 										System.out.println(((StringReference) ob).value());
-										System.out.println("----");
 									}
 									if (ob instanceof ClassObjectReference){
-										//System.out.println("ARRRRR");
 										System.out.println("OBREF");
 										//System.out.println(k.name());
 										//System.out.println(((ClassObjectReference) ob).reflectedType());
 										//System.out.println("----");
 									}
 									if (ob instanceof ClassLoaderReference){
-										//System.out.println("ARRRRR");
 										System.out.println("LOADER");
 										//System.out.println(k.name());
 										//System.out.println(((ClassObjectReference) ob).reflectedType());
 										//System.out.println("----");
 									}
 								}
-								//System.out.println("THIS:" + ob.getClass());
 								System.out.println();
-								ContentStructure new_variable_cs = new ContentStructure(current_localvar.name(), current_stack.getValue(current_localvar).toString(), current_localvar.typeName(), (long)current_localvar.hashCode(), new ArrayList<ContentStructure>(), current_localvar);
+								ContentStructure new_variable_cs = new ContentStructure(k.name(), j.getValue(k).toString(), k.typeName(), (long)k.hashCode(), new ArrayList<ContentStructure>(), k);
 								new_stack_cs.contents.add(new_variable_cs);
-								System.out.println("THIS VARIABLE IS OF TYPE: " + current_stack.getValue(current_localvar).type().name());
+								//System.out.println("THIS VARIABLE IS OF TYPE: " + j.getValue(k).type().name());
 								System.out.println();
 								//System.out.println("        " + k.typeName() + " " + k.name() + " = " + j.getValue(k));
 							}
