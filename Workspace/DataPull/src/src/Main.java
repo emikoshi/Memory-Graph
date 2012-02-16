@@ -138,24 +138,29 @@ public class Main {
 	//This method returns a ContentStructure containing all of the threads, stacks, and variables within this program
 	//Possible problems: infinite loop if there is a cycle in the graph (a sequence of nodes that point to each other).
 	private static ContentStructure store_vm_contents(VirtualMachine target_vm) {
-		ContentStructure head = new ContentStructure("Base", null, "head", (long)0, new ArrayList<ContentStructure>(), target_vm);
+		ContentStructure head = new ContentStructure("Base", null, "head", 0l, 0l, new ArrayList<ContentStructure>(), target_vm);
 		
 		for (ThreadReference i:target_vm.allThreads()) {
 			i.suspend();
 			if (!(i.name().equals("Reference Handler") || i.name().equals("Finalizer") || i.name().equals("Signal Dispatcher"))) {
-				ContentStructure new_thread_cs = new ContentStructure(i.name(), null, "thread", i.uniqueID(), new ArrayList<ContentStructure>(), i);				
+				ContentStructure new_thread_cs = new ContentStructure(i.name(), null, "thread", i.uniqueID(), 0l, new ArrayList<ContentStructure>(), i);				
 				head.contents.add(new_thread_cs);
 				//Here we might want to say that new_thread_cs is pointed to BY head, like another array to hold that data
 				
 				int stack_number = 0;
 				try {
+					//Adding the stack frames to the content structure and displaying them
 					for (StackFrame j:i.frames()) {						
-						ContentStructure new_stack_cs = new ContentStructure(j.toString(), null, "stack_frame", (long)stack_number, new ArrayList<ContentStructure>(), j);
+						ContentStructure new_stack_cs = new ContentStructure(j.toString(), null, "stack_frame", (long)stack_number, 0l, new ArrayList<ContentStructure>(), j);
 						stack_number++;
 						new_thread_cs.contents.add(new_stack_cs);
 						try {
+							//for each local variable in the stack frame,we are retrieving
+							//the visible variables
 							for (LocalVariable k:j.visibleVariables()) {
 								Value v = j.getValue(k);
+								//if the value is primitive value,goes through each type
+								//of primitive values and prints those types to the content structure
 								if (v instanceof PrimitiveValue){
 									PrimitiveValue pv = null;
 									pv = ((PrimitiveValue) v);
@@ -175,6 +180,8 @@ public class Main {
 										System.out.println(k.name()+" is a PrimitiveValue. Its type is FloatValue, with a value of: "+pv.floatValue());
 									}
 									if (pv instanceof IntegerValue){
+										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.intValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
+										new_stack_cs.contents.add(new_variable_cs);
 										System.out.println(k.name()+" is a PrimitiveValue. Its type is IntegerValue, with a value of: "+pv.intValue());
 									}
 									if (pv instanceof LongValue){
@@ -187,11 +194,14 @@ public class Main {
 										System.out.println(k.name()+" is a PrimitiveValue. Its type is VoidValue, and is...VOID");
 									}	
 								}
-								
+								//It checks for an instance of Object reference
+								//prints the type as well as the unique ID for each variable 
 								if (v instanceof ObjectReference){
-									System.out.println(((ObjectReference) v).uniqueID());
+									
+									System.out.println("This objects unique ID is " + ((ObjectReference) v).uniqueID());
 									ObjectReference ob = null;
 									ob = ((ObjectReference) v);
+
 									ReferenceType reft = ob.referenceType();
 									List<Field> flist = reft.fields();
 									System.out.println(k.name() + " is a reference of " + reft.name());
@@ -212,38 +222,31 @@ public class Main {
 										System.out.println(((StringReference) ob).value());
 									}
 									if (ob instanceof ClassObjectReference){
-										System.out.println("OBREF");
-										//System.out.println(k.name());
-										//System.out.println(((ClassObjectReference) ob).reflectedType());
-										//System.out.println("----");
+										System.out.println("This is a ClassObjectReference:");
+										
 									}
 									if (ob instanceof ClassLoaderReference){
-										System.out.println("LOADER");
-										//System.out.println(k.name());
-										//System.out.println(((ClassObjectReference) ob).reflectedType());
-										//System.out.println("----");
+										System.out.println("This is a ClassLoaderReference:");
 									}
 								}
 								System.out.println();
-								ContentStructure new_variable_cs = new ContentStructure(k.name(), j.getValue(k).toString(), k.typeName(), (long)k.hashCode(), new ArrayList<ContentStructure>(), k);
-								new_stack_cs.contents.add(new_variable_cs);
-								//System.out.println("THIS VARIABLE IS OF TYPE: " + j.getValue(k).type().name());
+//								ContentStructure new_variable_cs = new ContentStructure(k.name(), j.getValue(k).toString(), k.typeName(), (long)k.hashCode(), (long)k.hashCode(), new ArrayList<ContentStructure>(), k);
+//								new_stack_cs.contents.add(new_variable_cs);
+								
 								System.out.println();
-								//System.out.println("        " + k.typeName() + " " + k.name() + " = " + j.getValue(k));
 							}
 						} catch (AbsentInformationException e) {
 							
 						}
 					}
 				} catch (IncompatibleThreadStateException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					// TODO Auto-generated catch blocks
 				}
 			}
 		}		
 		return head;		
 	}
-	
+	//function used to print the content structure
 	private static void print_content_structure(ContentStructure cs, String spaces) {
 		System.out.println(spaces + cs.type + " " + cs.name + (cs.value == null ? "" : " = " + cs.value));	
 		for (ContentStructure i:cs.contents) print_content_structure(i, spaces+"   ");		
