@@ -1,7 +1,4 @@
-package src;
 import java.util.ArrayList;
-
-import com.sun.jdi.Value;
 
 
 public class ContentStructure {
@@ -15,14 +12,16 @@ public class ContentStructure {
 	 * 3 = 
 	 */
 	long id;
+	long uid;
 	ArrayList<ContentStructure> contents;
 	Object original;
 	
-	public ContentStructure(String n, String v, String t, long i, ArrayList<ContentStructure> c, Object o) {
+	public ContentStructure(String n, String v, String t, long i,long ui, ArrayList<ContentStructure> c, Object o) {
 		this.name = n;
 		this.value = v;
 		this.type = t;
 		this.id = i;
+		this.uid = ui;
 		this.contents = c;
 		this.original = o;
 	}
