@@ -8,6 +8,7 @@ import com.sun.jdi.Bootstrap;
 import com.sun.jdi.ByteValue;
 import com.sun.jdi.CharValue;
 import com.sun.jdi.ClassLoaderReference;
+import com.sun.jdi.ClassNotLoadedException;
 import com.sun.jdi.ClassObjectReference;
 import com.sun.jdi.DoubleValue;
 import com.sun.jdi.Field;
@@ -165,18 +166,28 @@ public class Main {
 									PrimitiveValue pv = null;
 									pv = ((PrimitiveValue) v);
 									if (pv instanceof BooleanValue){
+										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.booleanValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
+										new_stack_cs.contents.add(new_variable_cs);
 										System.out.println(k.name()+" is a PrimitiveValue. Its type is BooleanValue, with a value of: "+pv.booleanValue());
 									}
 									if (pv instanceof ByteValue){
+										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.byteValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
+										new_stack_cs.contents.add(new_variable_cs);
 										System.out.println(k.name()+" is a PrimitiveValue. Its type is ByteValue, with a value of: "+pv.byteValue());
 									}
 									if (pv instanceof CharValue){
+										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.charValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
+										new_stack_cs.contents.add(new_variable_cs);
 										System.out.println(k.name()+" is a PrimitiveValue. Its type is CharValue, with a value of: "+pv.charValue());
 									}
 									if (pv instanceof DoubleValue){
+										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.doubleValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
+										new_stack_cs.contents.add(new_variable_cs);
 										System.out.println(k.name()+" is a PrimitiveValue. Its type is DoubleValue, with a value of: "+pv.doubleValue());
 									}
 									if (pv instanceof FloatValue){
+										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.floatValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
+										new_stack_cs.contents.add(new_variable_cs);
 										System.out.println(k.name()+" is a PrimitiveValue. Its type is FloatValue, with a value of: "+pv.floatValue());
 									}
 									if (pv instanceof IntegerValue){
@@ -185,35 +196,44 @@ public class Main {
 										System.out.println(k.name()+" is a PrimitiveValue. Its type is IntegerValue, with a value of: "+pv.intValue());
 									}
 									if (pv instanceof LongValue){
+										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.longValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
+										new_stack_cs.contents.add(new_variable_cs);
 										System.out.println(k.name()+" is a PrimitiveValue. Its type is LongValue, with a value of: "+pv.longValue());
 									}
 									if (pv instanceof ShortValue){
+										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.shortValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
+										new_stack_cs.contents.add(new_variable_cs);
 										System.out.println(k.name()+" is a PrimitiveValue. Its type is ShortValue, with a value of: "+pv.shortValue());
 									}
 									if (pv instanceof VoidValue){
+										ContentStructure new_variable_cs = new ContentStructure(k.name(), "VOID", pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
+										new_stack_cs.contents.add(new_variable_cs);
 										System.out.println(k.name()+" is a PrimitiveValue. Its type is VoidValue, and is...VOID");
 									}	
 								}
 								//It checks for an instance of Object reference
 								//prints the type as well as the unique ID for each variable 
 								if (v instanceof ObjectReference){
-									
-									System.out.println("This objects unique ID is " + ((ObjectReference) v).uniqueID());
+									object_dfs(new_thread_cs,v);
+//									System.out.println("This objects unique ID is " + ((ObjectReference) v).uniqueID());
 									ObjectReference ob = null;
 									ob = ((ObjectReference) v);
-
 									ReferenceType reft = ob.referenceType();
 									List<Field> flist = reft.fields();
-									System.out.println(k.name() + " is a reference of " + reft.name());
+									//System.out.println(k.name() + " is a reference of " + reft.name());
 									System.out.println(k.name() + " = "+ob.getValues(flist));
 									if (ob instanceof ArrayReference){
 										List<Value> lolarr = ((ArrayReference) ob).getValues();
 										Object[] listarr = lolarr.toArray();
 										if (listarr.length < 1){
+											ContentStructure new_variable_cs = new ContentStructure(k.name(), "[]", ob.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
+											new_stack_cs.contents.add(new_variable_cs);
 											System.out.println(((ArrayReference) ob).getValues());
 										}
 										else{
 											for (int u=0; u<listarr.length; u++){
+												ContentStructure new_variable_cs = new ContentStructure(k.name()+"["+u+"]", listarr[u].toString(), ob.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
+												new_stack_cs.contents.add(new_variable_cs);
 												System.out.println("Element " + u + " of "+k.name()+ " = "+ listarr[u]);
 											}
 										}
@@ -244,11 +264,34 @@ public class Main {
 				}
 			}
 		}		
-		return head;		
+		return head;
+		
 	}
 	//function used to print the content structure
 	private static void print_content_structure(ContentStructure cs, String spaces) {
 		System.out.println(spaces + cs.type + " " + cs.name + (cs.value == null ? "" : " = " + cs.value));	
 		for (ContentStructure i:cs.contents) print_content_structure(i, spaces+"   ");		
 	}	
+	private static void object_dfs(ContentStructure cs, Value v){
+		//make DFS
+		//ContentStructure new_stack_cs = new ContentStructure(j.toString(), null, "stack_frame", (long)stack_number, 0l, new ArrayList<ContentStructure>(), j);
+		ObjectReference ob = null;
+		ob = ((ObjectReference) v);
+		ReferenceType reft = ob.referenceType();
+		List<Field> flist = reft.fields();
+		System.out.println("hi");
+		for (Field fld: flist){
+			try {
+				if (fld.type() instanceof ObjectReference){
+					System.out.println("succccces");
+					ContentStructure new_variable_cs = new ContentStructure(v.type().name(), ob.getValues(flist).toString(), ob.type().toString(), (long)v.hashCode(), 0l, new ArrayList<ContentStructure>(), v);
+					cs.contents.add(new_variable_cs);
+					object_dfs(cs,v);
+				}
+			} catch (ClassNotLoadedException e) {
+				// TODO Auto-generated catch block
+				//e.printStackTrace();
+			}
+		}
+	}
 }
