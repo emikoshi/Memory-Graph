@@ -298,6 +298,7 @@ public class Main {
 					}
 					else
 						seen.add(v);
+						//print out the contents of seen
 						System.out.println("This is what's in the set"+ seen);
 						object_dfs(cs,v,seen);
 				}
