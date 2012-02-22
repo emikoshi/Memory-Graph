@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import com.sun.jdi.AbsentInformationException;
 import com.sun.jdi.ArrayReference;
@@ -214,14 +215,19 @@ public class Main {
 								//It checks for an instance of Object reference
 								//prints the type as well as the unique ID for each variable 
 								if (v instanceof ObjectReference){
-									object_dfs(new_thread_cs,v);
+									try {
+//										HashSet<Value> seen = r;
+										object_dfs(new_thread_cs,v,seen);
+									} catch (ClassNotLoadedException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
 //									System.out.println("This objects unique ID is " + ((ObjectReference) v).uniqueID());
-									ObjectReference ob = null;
-									ob = ((ObjectReference) v);
-									ReferenceType reft = ob.referenceType();
-									List<Field> flist = reft.fields();
-									//System.out.println(k.name() + " is a reference of " + reft.name());
-									System.out.println(k.name() + " = "+ob.getValues(flist));
+									ObjectReference ob = ((ObjectReference) v);
+//									ReferenceType reft = ob.referenceType();
+//									List<Field> flist = reft.fields();
+//									System.out.println(k.name() + " is a reference of " + reft.name());
+//									System.out.println(k.name() + " = "+ob.getValues(flist));
 									if (ob instanceof ArrayReference){
 										List<Value> lolarr = ((ArrayReference) ob).getValues();
 										Object[] listarr = lolarr.toArray();
@@ -272,26 +278,30 @@ public class Main {
 		System.out.println(spaces + cs.type + " " + cs.name + (cs.value == null ? "" : " = " + cs.value));	
 		for (ContentStructure i:cs.contents) print_content_structure(i, spaces+"   ");		
 	}	
-	private static void object_dfs(ContentStructure cs, Value v){
+	private static void object_dfs(ContentStructure cs, Value v, HashSet<Value> seen) throws ClassNotLoadedException{
 		//make DFS
 		//ContentStructure new_stack_cs = new ContentStructure(j.toString(), null, "stack_frame", (long)stack_number, 0l, new ArrayList<ContentStructure>(), j);
 		ObjectReference ob = null;
 		ob = ((ObjectReference) v);
 		ReferenceType reft = ob.referenceType();
 		List<Field> flist = reft.fields();
-		System.out.println("hi");
+		//System.out.println("hi");
+		ContentStructure new_variable_cs = new ContentStructure(v.type().name(), ob.getValues(flist).toString(), ob.type().toString(), (long)v.hashCode(), 0l, new ArrayList<ContentStructure>(), v);
+		cs.contents.add(new_variable_cs);
 		for (Field fld: flist){
-			try {
-				if (fld.type() instanceof ObjectReference){
+			if (ob.getValue(fld) != null){
+				System.out.println("Field=" + ob.getValue(fld).type() + " is not null");
+				if (ob.getValue(fld) instanceof ObjectReference){
 					System.out.println("succccces");
-					ContentStructure new_variable_cs = new ContentStructure(v.type().name(), ob.getValues(flist).toString(), ob.type().toString(), (long)v.hashCode(), 0l, new ArrayList<ContentStructure>(), v);
-					cs.contents.add(new_variable_cs);
-					object_dfs(cs,v);
+					if (seen.contains(v)){
+						break;
+					}
+					else
+						seen.add(v);
+						object_dfs(cs,v,seen);
 				}
-			} catch (ClassNotLoadedException e) {
-				// TODO Auto-generated catch block
-				//e.printStackTrace();
 			}
 		}
 	}
+	
 }
