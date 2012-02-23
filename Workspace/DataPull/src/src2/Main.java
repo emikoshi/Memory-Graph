@@ -287,20 +287,30 @@ public class Main {
 		//System.out.println("hi");
 		ContentStructure new_variable_cs = new ContentStructure(v.type().name(), ob.getValues(flist).toString(), ob.type().toString(), (long)v.hashCode(), 0l, new ArrayList<ContentStructure>(), v);
 		cs.contents.add(new_variable_cs);
-		System.out.println("I added: " + v.type().name()+ ob.getValues(flist).toString()+ob.type().toString());
+		//System.out.println("I added: " + v.type().name() + ob.getValues(flist).toString());
+
 		for (Field fld: flist){
+			System.out.println("This is the list of fields: "+flist);
+			System.out.println("Were on field: " + fld);
 			if (ob.getValue(fld) != null){
-				System.out.println("Field=" + ob.getValue(fld).type() + " is not null");
+				//System.out.println("Field=" + ob.getValue(fld).type() + " is not null");
 				if (ob.getValue(fld) instanceof ObjectReference){
 					System.out.println("succccces");
 					System.out.println("It will exit with: "+ob.getValue(fld));
+					System.out.println("Seen is: "+seen);
 					if (seen.contains(v)){
 						System.out.println("Its exiting");
 						break;
 					}
 					else
-						seen.add(v);
-						object_dfs(cs,v,seen);
+						if (ob.getValue(fld).toString().startsWith("java.lang")){
+							//System.out.println(ob.getValue(fld));
+							seen.add(ob.getValue(fld));
+							break;
+						}
+						else
+							seen.add(ob.getValue(fld));
+							object_dfs(cs,ob.getValue(fld),seen);
 				}
 			}
 		}
