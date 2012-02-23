@@ -1,0 +1,9 @@
+-Have 2 people work on the debugger and the raw data
+--Research and learn how the debugger works
+--Use DFS on the raw data to pull individual features out
+--Push this data to the main function
+
+-Have 2 people work on the graphics and the outputs
+--Pull data from main and figure out how the graphics should be displayed
+--Which graphics should be used, where do variable names go, padding 
+dddsaZZZZ
