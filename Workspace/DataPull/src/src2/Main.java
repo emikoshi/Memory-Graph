@@ -1,10 +1,7 @@
-package src2;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-
-
 import com.sun.jdi.AbsentInformationException;
 import com.sun.jdi.ArrayReference;
 import com.sun.jdi.BooleanValue;
@@ -172,58 +169,57 @@ public class Main {
 									if (pv instanceof BooleanValue){
 										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.booleanValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
 										new_stack_cs.contents.add(new_variable_cs);
-										System.out.println(k.name()+" is a PrimitiveValue. Its type is BooleanValue, with a value of: "+pv.booleanValue());
+										//System.out.println(k.name()+" is a PrimitiveValue. Its type is BooleanValue, with a value of: "+pv.booleanValue());
 									}
 									if (pv instanceof ByteValue){
 										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.byteValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
 										new_stack_cs.contents.add(new_variable_cs);
-										System.out.println(k.name()+" is a PrimitiveValue. Its type is ByteValue, with a value of: "+pv.byteValue());
+										//System.out.println(k.name()+" is a PrimitiveValue. Its type is ByteValue, with a value of: "+pv.byteValue());
 									}
 									if (pv instanceof CharValue){
 										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.charValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
 										new_stack_cs.contents.add(new_variable_cs);
-										System.out.println(k.name()+" is a PrimitiveValue. Its type is CharValue, with a value of: "+pv.charValue());
+										//System.out.println(k.name()+" is a PrimitiveValue. Its type is CharValue, with a value of: "+pv.charValue());
 									}
 									if (pv instanceof DoubleValue){
 										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.doubleValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
 										new_stack_cs.contents.add(new_variable_cs);
-										System.out.println(k.name()+" is a PrimitiveValue. Its type is DoubleValue, with a value of: "+pv.doubleValue());
+										//System.out.println(k.name()+" is a PrimitiveValue. Its type is DoubleValue, with a value of: "+pv.doubleValue());
 									}
 									if (pv instanceof FloatValue){
 										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.floatValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
 										new_stack_cs.contents.add(new_variable_cs);
-										System.out.println(k.name()+" is a PrimitiveValue. Its type is FloatValue, with a value of: "+pv.floatValue());
+										//System.out.println(k.name()+" is a PrimitiveValue. Its type is FloatValue, with a value of: "+pv.floatValue());
 									}
 									if (pv instanceof IntegerValue){
 										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.intValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
 										new_stack_cs.contents.add(new_variable_cs);
-										System.out.println(k.name()+" is a PrimitiveValue. Its type is IntegerValue, with a value of: "+pv.intValue());
+										//System.out.println(k.name()+" is a PrimitiveValue. Its type is IntegerValue, with a value of: "+pv.intValue());
 									}
 									if (pv instanceof LongValue){
 										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.longValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
 										new_stack_cs.contents.add(new_variable_cs);
-										System.out.println(k.name()+" is a PrimitiveValue. Its type is LongValue, with a value of: "+pv.longValue());
+										//System.out.println(k.name()+" is a PrimitiveValue. Its type is LongValue, with a value of: "+pv.longValue());
 									}
 									if (pv instanceof ShortValue){
 										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.shortValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
 										new_stack_cs.contents.add(new_variable_cs);
-										System.out.println(k.name()+" is a PrimitiveValue. Its type is ShortValue, with a value of: "+pv.shortValue());
+										//System.out.println(k.name()+" is a PrimitiveValue. Its type is ShortValue, with a value of: "+pv.shortValue());
 									}
 									if (pv instanceof VoidValue){
 										ContentStructure new_variable_cs = new ContentStructure(k.name(), "VOID", pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
 										new_stack_cs.contents.add(new_variable_cs);
-										System.out.println(k.name()+" is a PrimitiveValue. Its type is VoidValue, and is...VOID");
+										//System.out.println(k.name()+" is a PrimitiveValue. Its type is VoidValue, and is...VOID");
 									}	
 								}
 								//It checks for an instance of Object reference
 								//prints the type as well as the unique ID for each variable 
-	          						if (v instanceof ObjectReference){
+								if (v instanceof ObjectReference){
 									try {
 										HashSet<Value> seen = new HashSet<Value>();
 										object_dfs(new_thread_cs,v,seen);
 									} catch (ClassNotLoadedException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
+										//e.printStackTrace();
 									}
 //									System.out.println("This objects unique ID is " + ((ObjectReference) v).uniqueID());
 									ObjectReference ob = ((ObjectReference) v);
@@ -291,18 +287,19 @@ public class Main {
 		//System.out.println("hi");
 		ContentStructure new_variable_cs = new ContentStructure(v.type().name(), ob.getValues(flist).toString(), ob.type().toString(), (long)v.hashCode(), 0l, new ArrayList<ContentStructure>(), v);
 		cs.contents.add(new_variable_cs);
+		System.out.println("I added: " + v.type().name()+ ob.getValues(flist).toString()+ob.type().toString());
 		for (Field fld: flist){
 			if (ob.getValue(fld) != null){
 				System.out.println("Field=" + ob.getValue(fld).type() + " is not null");
 				if (ob.getValue(fld) instanceof ObjectReference){
 					System.out.println("succccces");
+					System.out.println("It will exit with: "+ob.getValue(fld));
 					if (seen.contains(v)){
+						System.out.println("Its exiting");
 						break;
 					}
 					else
 						seen.add(v);
-						//print out the contents of seen
-						System.out.println("This is what's in the set"+ seen);
 						object_dfs(cs,v,seen);
 				}
 			}
