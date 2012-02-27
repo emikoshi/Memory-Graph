@@ -20,7 +20,6 @@ public class Grapher extends JFrame {
 		
 		try
 		{
-			
 			for (ContentStructure i:cs.contents) {
 				dfs(parent, null, graph, i, 1, 1);
 			}
@@ -46,11 +45,11 @@ public class Grapher extends JFrame {
 	public static void dfs(Object defaultParent, Object parent, mxGraph graph, ContentStructure cs, double x, double y) {
 		Object newParent;
 		if (cs.type.equals("thread")) {
-			newParent = graph.insertVertex(defaultParent, null, (cs.name.length() >= 10 ? cs.name.substring(0,25) : cs.name), 1, (720/2 - (150/2)), 150, 30, "fillColor=#7F15CB;fontColor=white", false);
+			newParent = graph.insertVertex(defaultParent, null, (cs.name.length() >= 10 ? cs.name.substring(0,10) : cs.name), 1, (720/2 - (150/2)), 150, 30, "fillColor=#7F15CB;fontColor=white", false);
 		} else if(cs.type.equals("stack_frame")) {
-			newParent = graph.insertVertex(defaultParent, null, (cs.name.length() >= 10 ? cs.name.substring(0,25) : cs.name), 160+x, y, 150, 30, "fillColor=#F4EC80;", false);
+			newParent = graph.insertVertex(defaultParent, null, (cs.name.length() >= 10 ? cs.name.substring(0,10) : cs.name), 160+x, y, 150, 30, "fillColor=#F4EC80;", false);
 		} else {
-			newParent = graph.insertVertex(defaultParent, null, (cs.name.length() >= 10 ? cs.name.substring(0,25) : cs.name), 350+x, y, 100, 25, "fillColor=#80B1F4;", false);
+			newParent = graph.insertVertex(defaultParent, null, (cs.name.length() >= 10 ? cs.name.substring(0,10) : cs.name), 350+x, y, 100, 25, "fillColor=#80B1F4;", false);
 		}
 		
 		if (parent != null) graph.insertEdge(defaultParent, null, "", parent, newParent);

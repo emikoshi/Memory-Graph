@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/home/student/lgraham01/Desktop/tools.jar"/>
-	<classpathentry kind="lib" path="/home/student/lgraham01/Desktop/jgraphx.jar"/>
+	<classpathentry kind="lib" path="/home/student/jfiscella/Memory-Graph/Workspace/jgraphx.jar"/>
+	<classpathentry kind="lib" path="/home/student/jfiscella/Memory-Graph/Workspace/tools.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

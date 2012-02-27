@@ -1,7 +1,12 @@
+package src2;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+
+import javax.swing.JFrame;
+
 import com.sun.jdi.AbsentInformationException;
 import com.sun.jdi.ArrayReference;
 import com.sun.jdi.BooleanValue;
@@ -33,6 +38,9 @@ import com.sun.jdi.connect.IllegalConnectorArgumentsException;
 import com.sun.jdi.ThreadReference;
 import com.sun.jdi.ReferenceType;
 
+import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.view.mxGraph;
+
 public class Main {
 	
 	//Make sure to compile before, running the JVM
@@ -48,7 +56,12 @@ public class Main {
 		System.out.println("\nPrinting the ContentStructure we gathered from the VM...");
 		
 		ContentStructure cs = store_vm_contents(target_vm);
-		print_content_structure(cs,"");
+		//print_content_structure(cs,"");
+
+		Grapher frame = new Grapher(cs);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(400, 320);
+		frame.setVisible(true);
 	}
 
 	private static VirtualMachine create_vm(String connectorName, int port) {
@@ -233,32 +246,32 @@ public class Main {
 										if (listarr.length < 1){
 											ContentStructure new_variable_cs = new ContentStructure(k.name(), "[]", ob.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
 											new_stack_cs.contents.add(new_variable_cs);
-											System.out.println(((ArrayReference) ob).getValues());
+											//System.out.println(((ArrayReference) ob).getValues());
 										}
 										else{
 											for (int u=0; u<listarr.length; u++){
 												ContentStructure new_variable_cs = new ContentStructure(k.name()+"["+u+"]", listarr[u].toString(), ob.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
 												new_stack_cs.contents.add(new_variable_cs);
-												System.out.println("Element " + u + " of "+k.name()+ " = "+ listarr[u]);
+												//System.out.println("Element " + u + " of "+k.name()+ " = "+ listarr[u]);
 											}
 										}
 									}
 									if (ob instanceof StringReference){
-										System.out.println(((StringReference) ob).value());
+										//System.out.println(((StringReference) ob).value());
 									}
 									if (ob instanceof ClassObjectReference){
-										System.out.println("This is a ClassObjectReference:");
+										//System.out.println("This is a ClassObjectReference:");
 										
 									}
 									if (ob instanceof ClassLoaderReference){
-										System.out.println("This is a ClassLoaderReference:");
+										//System.out.println("This is a ClassLoaderReference:");
 									}
 								}
-								System.out.println();
+								//System.out.println();
 //								ContentStructure new_variable_cs = new ContentStructure(k.name(), j.getValue(k).toString(), k.typeName(), (long)k.hashCode(), (long)k.hashCode(), new ArrayList<ContentStructure>(), k);
 //								new_stack_cs.contents.add(new_variable_cs);
 								
-								System.out.println();
+								//System.out.println();
 							}
 						} catch (AbsentInformationException e) {
 							
@@ -280,8 +293,7 @@ public class Main {
 	private static void object_dfs(ContentStructure cs, Value v, HashSet<Value> seen) throws ClassNotLoadedException{
 		//make DFS
 		//ContentStructure new_stack_cs = new ContentStructure(j.toString(), null, "stack_frame", (long)stack_number, 0l, new ArrayList<ContentStructure>(), j);
-		ObjectReference ob = null;
-		ob = ((ObjectReference) v);
+		ObjectReference ob = ((ObjectReference) v);
 		ReferenceType reft = ob.referenceType();
 		List<Field> flist = reft.fields();
 		//System.out.println("hi");
@@ -291,7 +303,7 @@ public class Main {
 
 		for (Field fld: flist){
 			System.out.println("This is the list of fields: "+flist);
-			System.out.println("Were on field: " + fld);
+			System.out.println("We're on field: " + fld);
 			if (ob.getValue(fld) != null){
 				//System.out.println("Field=" + ob.getValue(fld).type() + " is not null");
 				if (ob.getValue(fld) instanceof ObjectReference){
@@ -302,18 +314,19 @@ public class Main {
 						System.out.println("Its exiting");
 						break;
 					}
-					else
+					else {
 						if (ob.getValue(fld).toString().startsWith("java.lang")){
 							//System.out.println(ob.getValue(fld));
 							seen.add(ob.getValue(fld));
 							break;
 						}
-						else
+						else {
 							seen.add(ob.getValue(fld));
 							object_dfs(cs,ob.getValue(fld),seen);
+						}
+					}
 				}
 			}
 		}
-	}
-	
+	}	
 }
