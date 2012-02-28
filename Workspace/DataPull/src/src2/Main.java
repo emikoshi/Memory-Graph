@@ -1,5 +1,3 @@
-package src2;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -62,6 +60,7 @@ public class Main {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(400, 320);
 		frame.setVisible(true);
+		System.out.println("WEGSBFDSBDHDHDSFHDSFHD");
 	}
 
 	private static VirtualMachine create_vm(String connectorName, int port) {
@@ -293,7 +292,8 @@ public class Main {
 	private static void object_dfs(ContentStructure cs, Value v, HashSet<Value> seen) throws ClassNotLoadedException{
 		//make DFS
 		//ContentStructure new_stack_cs = new ContentStructure(j.toString(), null, "stack_frame", (long)stack_number, 0l, new ArrayList<ContentStructure>(), j);
-		ObjectReference ob = ((ObjectReference) v);
+		ObjectReference ob = null;
+		ob = ((ObjectReference) v);
 		ReferenceType reft = ob.referenceType();
 		List<Field> flist = reft.fields();
 		//System.out.println("hi");
@@ -303,7 +303,7 @@ public class Main {
 
 		for (Field fld: flist){
 			System.out.println("This is the list of fields: "+flist);
-			System.out.println("We're on field: " + fld);
+			System.out.println("Were on field: " + fld);
 			if (ob.getValue(fld) != null){
 				//System.out.println("Field=" + ob.getValue(fld).type() + " is not null");
 				if (ob.getValue(fld) instanceof ObjectReference){
@@ -314,19 +314,20 @@ public class Main {
 						System.out.println("Its exiting");
 						break;
 					}
-					else {
-						if (ob.getValue(fld).toString().startsWith("java.lang")){
+					else
+						//System.out.println("DFSDF"+fld.typeName().toString());
+						if (fld.typeName().toString().startsWith("java.lang")){
 							//System.out.println(ob.getValue(fld));
+							System.out.println("We've reached a java.lang");
 							seen.add(ob.getValue(fld));
 							break;
 						}
-						else {
+						else
 							seen.add(ob.getValue(fld));
 							object_dfs(cs,ob.getValue(fld),seen);
-						}
-					}
 				}
 			}
 		}
-	}	
+	}
+
 }
