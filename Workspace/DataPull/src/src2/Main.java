@@ -1,3 +1,5 @@
+package src2;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -54,7 +56,7 @@ public class Main {
 		System.out.println("\nPrinting the ContentStructure we gathered from the VM...");
 		
 		ContentStructure cs = store_vm_contents(target_vm);
-		//print_content_structure(cs,"");
+		print_content_structure(cs,"");
 
 		Grapher frame = new Grapher(cs);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -175,9 +177,11 @@ public class Main {
 								Value v = j.getValue(k);
 								//if the value is primitive value,goes through each type
 								//of primitive values and prints those types to the content structure
-								if (v instanceof PrimitiveValue){
+
+								if (v instanceof PrimitiveValue){	
 									PrimitiveValue pv = null;
 									pv = ((PrimitiveValue) v);
+																																		
 									if (pv instanceof BooleanValue){
 										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.booleanValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
 										new_stack_cs.contents.add(new_variable_cs);
@@ -227,45 +231,49 @@ public class Main {
 								//It checks for an instance of Object reference
 								//prints the type as well as the unique ID for each variable 
 								if (v instanceof ObjectReference){
+									ContentStructure new_variable_cs = new ContentStructure(k.name(), v.toString(), v.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
 									try {
 										HashSet<Value> seen = new HashSet<Value>();
-										object_dfs(new_thread_cs,v,seen);
+										object_dfs(new_variable_cs,v,seen);
+										new_stack_cs.contents.add(new_variable_cs);
 									} catch (ClassNotLoadedException e) {
 										//e.printStackTrace();
 									}
 //									System.out.println("This objects unique ID is " + ((ObjectReference) v).uniqueID());
-									ObjectReference ob = ((ObjectReference) v);
+
 //									ReferenceType reft = ob.referenceType();
 //									List<Field> flist = reft.fields();
 //									System.out.println(k.name() + " is a reference of " + reft.name());
 //									System.out.println(k.name() + " = "+ob.getValues(flist));
-									if (ob instanceof ArrayReference){
-										List<Value> lolarr = ((ArrayReference) ob).getValues();
-										Object[] listarr = lolarr.toArray();
-										if (listarr.length < 1){
-											ContentStructure new_variable_cs = new ContentStructure(k.name(), "[]", ob.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
-											new_stack_cs.contents.add(new_variable_cs);
-											//System.out.println(((ArrayReference) ob).getValues());
-										}
-										else{
-											for (int u=0; u<listarr.length; u++){
-												ContentStructure new_variable_cs = new ContentStructure(k.name()+"["+u+"]", listarr[u].toString(), ob.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
-												new_stack_cs.contents.add(new_variable_cs);
-												//System.out.println("Element " + u + " of "+k.name()+ " = "+ listarr[u]);
-											}
-										}
-									}
-									if (ob instanceof StringReference){
-										//System.out.println(((StringReference) ob).value());
-									}
-									if (ob instanceof ClassObjectReference){
-										//System.out.println("This is a ClassObjectReference:");
-										
-									}
-									if (ob instanceof ClassLoaderReference){
-										//System.out.println("This is a ClassLoaderReference:");
-									}
 								}
+//								ObjectReference ob = ((ObjectReference) v);
+//								if (ob instanceof ArrayReference){
+//									List<Value> lolarr = ((ArrayReference) ob).getValues();
+//									Object[] listarr = lolarr.toArray();
+//									if (listarr.length < 1){
+//										ContentStructure new_variable_cs = new ContentStructure(k.name(), "[]", ob.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
+//										new_stack_cs.contents.add(new_variable_cs);
+//										//System.out.println(((ArrayReference) ob).getValues());
+//									}
+//									else{
+//										for (int u=0; u<listarr.length; u++){
+//											ContentStructure new_variable_cs = new ContentStructure(k.name()+"["+u+"]", listarr[u].toString(), ob.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
+//											new_stack_cs.contents.add(new_variable_cs);
+//											//System.out.println("Element " + u + " of "+k.name()+ " = "+ listarr[u]);
+//										}
+//									}
+//								}
+//								if (ob instanceof StringReference){
+//									//System.out.println(((StringReference) ob).value());
+//								}
+//								if (ob instanceof ClassObjectReference){
+//									//System.out.println("This is a ClassObjectReference:");
+//									
+//								}
+//								if (ob instanceof ClassLoaderReference){
+//									//System.out.println("This is a ClassLoaderReference:");
+//								}
+								
 								//System.out.println();
 //								ContentStructure new_variable_cs = new ContentStructure(k.name(), j.getValue(k).toString(), k.typeName(), (long)k.hashCode(), (long)k.hashCode(), new ArrayList<ContentStructure>(), k);
 //								new_stack_cs.contents.add(new_variable_cs);
@@ -297,8 +305,6 @@ public class Main {
 		ReferenceType reft = ob.referenceType();
 		List<Field> flist = reft.fields();
 		//System.out.println("hi");
-		ContentStructure new_variable_cs = new ContentStructure(v.type().name(), ob.getValues(flist).toString(), ob.type().toString(), (long)v.hashCode(), 0l, new ArrayList<ContentStructure>(), v);
-		cs.contents.add(new_variable_cs);
 		//System.out.println("I added: " + v.type().name() + ob.getValues(flist).toString());
 
 		for (Field fld: flist){
@@ -310,11 +316,11 @@ public class Main {
 					System.out.println("succccces");
 					System.out.println("It will exit with: "+ob.getValue(fld));
 					System.out.println("Seen is: "+seen);
-					if (seen.contains(v)){
+					if (seen.contains(ob.getValue(fld))) {
 						System.out.println("Its exiting");
 						break;
 					}
-					else
+					else {
 						//System.out.println("DFSDF"+fld.typeName().toString());
 						if (fld.typeName().toString().startsWith("java.lang")){
 							//System.out.println(ob.getValue(fld));
@@ -322,12 +328,15 @@ public class Main {
 							seen.add(ob.getValue(fld));
 							break;
 						}
-						else
+						else {
 							seen.add(ob.getValue(fld));
-							object_dfs(cs,ob.getValue(fld),seen);
+							ContentStructure new_variable_cs = new ContentStructure(fld.type().name(), ob.getValue(fld).toString(), fld.type().toString(), (long)fld.hashCode(), 0l, new ArrayList<ContentStructure>(), v);
+							cs.contents.add(new_variable_cs);
+							object_dfs(new_variable_cs,ob.getValue(fld),seen);
+						}
+					}
 				}
 			}
 		}
 	}
-
 }
