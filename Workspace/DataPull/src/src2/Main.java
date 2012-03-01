@@ -1,5 +1,3 @@
-package src2;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -175,6 +173,7 @@ public class Main {
 							//the visible variables
 							for (LocalVariable k:j.visibleVariables()) {
 								Value v = j.getValue(k);
+								HashSet<Value> seen = new HashSet<Value>();
 								//if the value is primitive value,goes through each type
 								//of primitive values and prints those types to the content structure
 
@@ -233,7 +232,6 @@ public class Main {
 								if (v instanceof ObjectReference){
 									ContentStructure new_variable_cs = new ContentStructure(k.name(), v.toString(), v.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
 									try {
-										HashSet<Value> seen = new HashSet<Value>();
 										object_dfs(new_variable_cs,v,seen);
 										new_stack_cs.contents.add(new_variable_cs);
 									} catch (ClassNotLoadedException e) {
@@ -247,22 +245,28 @@ public class Main {
 //									System.out.println(k.name() + " = "+ob.getValues(flist));
 								}
 //								ObjectReference ob = ((ObjectReference) v);
-//								if (ob instanceof ArrayReference){
-//									List<Value> lolarr = ((ArrayReference) ob).getValues();
-//									Object[] listarr = lolarr.toArray();
-//									if (listarr.length < 1){
-//										ContentStructure new_variable_cs = new ContentStructure(k.name(), "[]", ob.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
-//										new_stack_cs.contents.add(new_variable_cs);
-//										//System.out.println(((ArrayReference) ob).getValues());
-//									}
-//									else{
-//										for (int u=0; u<listarr.length; u++){
-//											ContentStructure new_variable_cs = new ContentStructure(k.name()+"["+u+"]", listarr[u].toString(), ob.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
-//											new_stack_cs.contents.add(new_variable_cs);
-//											//System.out.println("Element " + u + " of "+k.name()+ " = "+ listarr[u]);
-//										}
-//									}
-//								}
+								else if (v instanceof ArrayReference){
+									List<Value> arrval = ((ArrayReference) v).getValues();
+									Object[] arr = arrval.toArray();
+									if (arr.length < 1){
+										ContentStructure new_variable_cs = new ContentStructure(k.name(), "[]", v.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
+										new_stack_cs.contents.add(new_variable_cs);
+										//System.out.println(((ArrayReference) ob).getValues());
+									}
+									else{
+										//for (int u=0; u<arr.length; u++){
+											ContentStructure new_variable_cs = new ContentStructure(k.name()+"[]", "1", v.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
+											try {
+												object_dfs(new_variable_cs,v,seen);
+											} catch (ClassNotLoadedException e) {
+												// TODO Auto-generated catch block
+												//e.printStackTrace();
+											}
+											new_stack_cs.contents.add(new_variable_cs);
+											//System.out.println("Element " + u + " of "+k.name()+ " = "+ listarr[u]);
+										//}
+									}
+								}
 //								if (ob instanceof StringReference){
 //									//System.out.println(((StringReference) ob).value());
 //								}
@@ -306,6 +310,20 @@ public class Main {
 		List<Field> flist = reft.fields();
 		//System.out.println("hi");
 		//System.out.println("I added: " + v.type().name() + ob.getValues(flist).toString());
+		if (v instanceof ArrayReference){
+			List<Value> arrval = ((ArrayReference) v).getValues();
+			Object[] arr = arrval.toArray();
+			for (int u=0; u<arr.length; u++){
+				//ContentStructure new_variable_cs = new ContentStructure(cs.name+"["+u+"]", arr[u].toString(), v.type().toString(), (long)arr.hashCode(), 0l, new ArrayList<ContentStructure>(),v);
+				if (arrval.get(u) instanceof PrimitiveValue){
+					cs.contents.add(new ContentStructure(cs.name+"["+u+"]", arr[u].toString(), arrval.get(u).type().toString(), (long)arr.hashCode(), 0l, new ArrayList<ContentStructure>(),v));
+				}
+				else{
+					ContentStructure new_variable_cs = new ContentStructure(cs.name+"["+u+"]", arr[u].toString(), v.type().toString(), (long)arr.hashCode(), 0l, new ArrayList<ContentStructure>(),v);
+					object_dfs(new_variable_cs,arrval.get(u),seen);
+				}
+			}
+		}
 
 		for (Field fld: flist){
 			System.out.println("This is the list of fields: "+flist);
@@ -333,6 +351,7 @@ public class Main {
 							ContentStructure new_variable_cs = new ContentStructure(fld.type().name(), ob.getValue(fld).toString(), fld.type().toString(), (long)fld.hashCode(), 0l, new ArrayList<ContentStructure>(), v);
 							cs.contents.add(new_variable_cs);
 							object_dfs(new_variable_cs,ob.getValue(fld),seen);
+
 						}
 					}
 				}
