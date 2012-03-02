@@ -1,3 +1,4 @@
+package src2;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -56,9 +57,10 @@ public class Main {
 		ContentStructure cs = store_vm_contents(target_vm);
 		print_content_structure(cs,"");
 
+		System.out.println("Graphing now...");
 		Grapher frame = new Grapher(cs);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(400, 320);
+		frame.setSize(1000, 900);
 		frame.setVisible(true);
 		System.out.println("WEGSBFDSBDHDHDSFHDSFHD");
 	}
@@ -153,6 +155,7 @@ public class Main {
 	//Possible problems: infinite loop if there is a cycle in the graph (a sequence of nodes that point to each other).
 	private static ContentStructure store_vm_contents(VirtualMachine target_vm) {
 		ContentStructure head = new ContentStructure("Base", null, "head", 0l, 0l, new ArrayList<ContentStructure>(), target_vm);
+		
 		
 		for (ThreadReference i:target_vm.allThreads()) {
 			i.suspend();
@@ -297,7 +300,7 @@ public class Main {
 		
 	}
 	//function used to print the content structure
-	private static void print_content_structure(ContentStructure cs, String spaces) {
+	public static void print_content_structure(ContentStructure cs, String spaces) {
 		System.out.println(spaces + cs.type + " " + cs.name + (cs.value == null ? "" : " = " + cs.value));	
 		for (ContentStructure i:cs.contents) print_content_structure(i, spaces+"   ");		
 	}	
@@ -351,7 +354,6 @@ public class Main {
 							ContentStructure new_variable_cs = new ContentStructure(fld.type().name(), ob.getValue(fld).toString(), fld.type().toString(), (long)fld.hashCode(), 0l, new ArrayList<ContentStructure>(), v);
 							cs.contents.add(new_variable_cs);
 							object_dfs(new_variable_cs,ob.getValue(fld),seen);
-
 						}
 					}
 				}
