@@ -5,7 +5,14 @@ import java.util.HashSet;
 import javax.swing.JFrame;
 
 
+import com.mxgraph.layout.mxCircleLayout;
 import com.mxgraph.layout.mxCompactTreeLayout;
+import com.mxgraph.layout.mxEdgeLabelLayout;
+import com.mxgraph.layout.mxGraphLayout;
+import com.mxgraph.layout.mxOrganicLayout;
+import com.mxgraph.layout.mxParallelEdgeLayout;
+import com.mxgraph.layout.mxPartitionLayout;
+import com.mxgraph.layout.mxStackLayout;
 import com.mxgraph.model.mxGraphModel;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.swing.mxGraphComponent;
@@ -31,7 +38,11 @@ public class Grapher extends JFrame {
 		mxIGraphModel model = new mxGraphModel();
 		final mxGraph graph = new mxGraph(model);
 		Object parent = graph.getDefaultParent();
-		final mxCompactTreeLayout m = new mxCompactTreeLayout(graph, false);
+		//final mxCircleLayout m = new mxCircleLayout(graph);
+		final mxCompactTreeLayout m = new mxCompactTreeLayout(graph);
+		m.setLevelDistance(20);
+		m.setNodeDistance(25);
+		
 		final mxGraphComponent graphComponent = new mxGraphComponent(graph);
 		
 		try
@@ -76,19 +87,19 @@ public class Grapher extends JFrame {
 	private void dfs(Object defaultParent, Object parent, mxGraph graph, ContentStructure cs, double x, double y, HashSet<ContentStructure> seen, HashMap<ContentStructure, Object> gm) {	
 		Object newParent;
 		// create a new parent, this is the new node we will now insert into the graph
-		if (cs.type.equals("thread")) {
-			newParent = graph.insertVertex(defaultParent, null, (cs.name.length() >= 10 ? cs.name.substring(0,10) : cs.name), 1, (720/2 - (150/2)), 150, 30, "fillColor=#7F15CB;fontColor=white", false);
+		if (cs.type.equals("thread")) {			
+			newParent = graph.insertVertex(defaultParent, null, (cs.type.length() >= 10 ? cs.type.substring(0,10) : cs.type), 1, (720/2 - (150/2)), 150, 30, "fillColor=#7F15CB;fontColor=white", false);
 			gm.put(cs, newParent);
 		} else if(cs.type.equals("stack_frame")) {
-			newParent = graph.insertVertex(defaultParent, null, (cs.name.length() >= 10 ? cs.name.substring(0,10) : cs.name), 160+x, y, 150, 30, "fillColor=#F4EC80;", false);
+			newParent = graph.insertVertex(defaultParent, null, (cs.type.length() >= 10 ? cs.type.substring(0,10) : cs.type), 160+x, y, 150, 30, "fillColor=#F4EC80;", false);
 			gm.put(cs, newParent);
 		} else {
-			newParent = graph.insertVertex(defaultParent, null, (cs.name.length() >= 10 ? cs.name.substring(0,10) : cs.name), 350+x, y, 100, 25, "fillColor=#80B1F4;", false);
+			newParent = graph.insertVertex(defaultParent, null, (cs.type.length() >= 10 ? cs.type.substring(0,10) : cs.type), 350+x, y, 100, 25, "fillColor=#80B1F4;", false);
 			gm.put(cs, newParent);
 		}
 		
 		// if the parent isn't null, insert an edge between the parent and newParent
-		if (parent != null) graph.insertEdge(defaultParent, null, "", parent, newParent);
+		if (parent != null) graph.insertEdge(defaultParent, null, (cs.name.length() >= 10 ? cs.name.substring(0,10) : cs.name), parent, newParent);
 		
 		// right now our position calculation sets x and y to 0.
 		double x_pos = 0, y_pos = 0;
@@ -100,14 +111,14 @@ public class Grapher extends JFrame {
 			System.out.println("There are " + cs.contents.size() + " stacks");
 		}
 		if (cs.contents.size() > 100) {
-			newParent = graph.insertVertex(defaultParent, null, (cs.name.length() >= 10 ? cs.name.substring(0,10) : cs.name)+"(...)", 350+x, y, 100, 25, "fillColor=#80B1F4;", false);
+			newParent = graph.insertVertex(defaultParent, null, (cs.type.length() >= 10 ? cs.type.substring(0,10) : cs.type)+"(...)", 350+x, y, 100, 25, "fillColor=#80B1F4;", false);
 			graph.insertEdge(defaultParent, null, "", parent, newParent);
 		} else {
 			for (ContentStructure current_cs:cs.contents) {
 				if (current_cs.type.equals("stack_frame")) {	
-					System.out.println("Stack: " + current_cs.name + " value=" + cs.value + "type=" + cs.type + "hashcode=" + cs.hashCode());
+					//System.out.println("Stack: " + current_cs.name + " value=" + cs.value + "type=" + cs.type + "hashcode=" + cs.hashCode());
 					if (seen.contains(current_cs)) {
-						System.out.println("there is a cycle .. drawing the edge only.");
+						//System.out.println("there is a cycle .. drawing the edge only.");
 						
 						// draw edge
 					} else {

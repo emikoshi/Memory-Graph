@@ -3,9 +3,9 @@ import java.util.ArrayList;
 
 
 public class ContentStructure {
-	String name;
-	String value;
-	String type;
+	String name = "";
+	String value = " ";
+	String type = "";
 	/* types:
 	 * 0 = head (only contains threads)
 	 * 1 = thread (only contains stacks)
