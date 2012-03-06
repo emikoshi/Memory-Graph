@@ -88,18 +88,18 @@ public class Grapher extends JFrame {
 		Object newParent;
 		// create a new parent, this is the new node we will now insert into the graph
 		if (cs.type.equals("thread")) {			
-			newParent = graph.insertVertex(defaultParent, null, (cs.type.length() >= 10 ? cs.type.substring(0,10) : cs.type), 1, (720/2 - (150/2)), 150, 30, "fillColor=#7F15CB;fontColor=white", false);
+			newParent = graph.insertVertex(defaultParent, null, (cs.type.length() >= 30 ? cs.type.substring(0,30) : cs.type), 1, (720/2 - (150/2)), 150, 30, "fillColor=#7F15CB;fontColor=white", false);
 			gm.put(cs, newParent);
 		} else if(cs.type.equals("stack_frame")) {
-			newParent = graph.insertVertex(defaultParent, null, (cs.type.length() >= 10 ? cs.type.substring(0,10) : cs.type), 160+x, y, 150, 30, "fillColor=#F4EC80;", false);
+			newParent = graph.insertVertex(defaultParent, null, (cs.type.length() >= 30 ? cs.type.substring(0,30) : cs.type), 160+x, y, 150, 30, "fillColor=#F4EC80;", false);
 			gm.put(cs, newParent);
 		} else {
-			newParent = graph.insertVertex(defaultParent, null, (cs.type.length() >= 10 ? cs.type.substring(0,10) : cs.type), 350+x, y, 100, 25, "fillColor=#80B1F4;", false);
+			newParent = graph.insertVertex(defaultParent, null, (cs.type.length() >= 30 ? cs.type.substring(0,30) : cs.type), 350+x, y, 100, 25, "fillColor=#80B1F4;", false);
 			gm.put(cs, newParent);
 		}
 		
 		// if the parent isn't null, insert an edge between the parent and newParent
-		if (parent != null) graph.insertEdge(defaultParent, null, (cs.name.length() >= 10 ? cs.name.substring(0,10) : cs.name), parent, newParent);
+		if (parent != null) graph.insertEdge(defaultParent, null, (cs.name.length() >= 30 ? cs.name.substring(0,30) : cs.name), parent, newParent);
 		
 		// right now our position calculation sets x and y to 0.
 		double x_pos = 0, y_pos = 0;
@@ -110,8 +110,9 @@ public class Grapher extends JFrame {
 		if (cs.type.equals("thread")) {
 			System.out.println("There are " + cs.contents.size() + " stacks");
 		}
-		if (cs.contents.size() > 100) {
-			newParent = graph.insertVertex(defaultParent, null, (cs.type.length() >= 10 ? cs.type.substring(0,10) : cs.type)+"(...)", 350+x, y, 100, 25, "fillColor=#80B1F4;", false);
+		if (cs.contents.size() > 20) {
+			newParent = graph.insertVertex(defaultParent, null, (cs.type.length() >= 30 ? cs.type.substring(0,30) : cs.type)+"(...)", 350+x, y, 100, 25, "fillColor=#80B1F4;", false);
+			gm.put(cs, newParent);
 			graph.insertEdge(defaultParent, null, "", parent, newParent);
 		} else {
 			for (ContentStructure current_cs:cs.contents) {

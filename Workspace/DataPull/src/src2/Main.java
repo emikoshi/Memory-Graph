@@ -353,14 +353,16 @@ public class Main {
 						//System.out.println("Seen is: "+seen);
 						if (seen.contains(ob.getValue(fld))) {
 							System.out.println(spaces+"We've found a seen value. It's exiting");
-							break;
+							//break;
 						} else {
 							System.out.println(spaces+"the type of this field is "+fld.typeName().toString());
 							if (fld.typeName().toString().startsWith("java.lang") && !fld.typeName().toString().startsWith("java.lang.Object[]")){
 								//System.out.println(ob.getValue(fld));
-								System.out.println(spaces+"We've reached a java.lang, adding to seen and ignoring it");
+								System.out.println(spaces+"We've reached a java.lang, adding to seen + content structure, then ignoring it");
+								ContentStructure new_variable_cs = new ContentStructure(fld.type().name(), ob.getValue(fld).toString(), fld.type().toString(), (long)fld.hashCode(), 0l, new ArrayList<ContentStructure>(), v);
+								cs.contents.add(new_variable_cs);
 								seen.add(ob.getValue(fld));
-								break;
+								//break;
 							}
 							else {
 								System.out.println(spaces+"we're going to DFS through the current field, it is not a java.lang ...");
@@ -371,8 +373,57 @@ public class Main {
 							}
 						}
 					}
+				} else if (ob.getValue(fld) == null) {
+					System.out.println(spaces+"This data is null. Moving on to the next field.");
 				} else {
-					System.out.println("This data is null. Moving on to the next field.");
+					System.out.println(spaces+"This data is a primitive value");			
+					System.out.println(spaces + "We have detected a PrimitiveValue. Adding it to the contentStructure.");
+					PrimitiveValue pv = (PrimitiveValue)ob.getValue(fld);
+					if (ob.getValue(fld) instanceof BooleanValue){
+						ContentStructure new_variable_cs = new ContentStructure(fld.type().name(), ""+pv.booleanValue(), pv.type().toString(), (long)fld.hashCode(), 0l, new ArrayList<ContentStructure>(), fld);
+						cs.contents.add(new_variable_cs);
+						System.out.println(spaces+fld.name()+" is a PrimitiveValue. Its type is BooleanValue, with a value of: "+pv.booleanValue());
+					}
+					if (ob.getValue(fld) instanceof ByteValue){
+						ContentStructure new_variable_cs = new ContentStructure(fld.type().name(), ""+pv.byteValue(), pv.type().toString(), (long)fld.hashCode(), 0l, new ArrayList<ContentStructure>(), fld);
+						cs.contents.add(new_variable_cs);
+						System.out.println(spaces+fld.name()+" is a PrimitiveValue. Its type is ByteValue, with a value of: "+pv.byteValue());
+					}
+					if (ob.getValue(fld) instanceof CharValue){
+						ContentStructure new_variable_cs = new ContentStructure(fld.type().name(), ""+pv.charValue(), pv.type().toString(), (long)fld.hashCode(), 0l, new ArrayList<ContentStructure>(), fld);
+						cs.contents.add(new_variable_cs);
+						System.out.println(spaces+fld.name()+" is a PrimitiveValue. Its type is CharValue, with a value of: "+pv.charValue());
+					}
+					if (ob.getValue(fld) instanceof DoubleValue){
+						ContentStructure new_variable_cs = new ContentStructure(fld.type().name(), ""+pv.doubleValue(), pv.type().toString(), (long)fld.hashCode(), 0l, new ArrayList<ContentStructure>(), fld);
+						cs.contents.add(new_variable_cs);
+						System.out.println(spaces+fld.name()+" is a PrimitiveValue. Its type is DoubleValue, with a value of: "+pv.doubleValue());
+					}
+					if (ob.getValue(fld) instanceof FloatValue){
+						ContentStructure new_variable_cs = new ContentStructure(fld.type().name(), ""+pv.floatValue(), pv.type().toString(), (long)fld.hashCode(), 0l, new ArrayList<ContentStructure>(), fld);
+						cs.contents.add(new_variable_cs);
+						System.out.println(spaces+fld.name()+" is a PrimitiveValue. Its type is FloatValue, with a value of: "+pv.floatValue());
+					}
+					if (ob.getValue(fld) instanceof IntegerValue){
+						ContentStructure new_variable_cs = new ContentStructure(fld.type().name(), ""+pv.intValue(), pv.type().toString(), (long)fld.hashCode(), 0l, new ArrayList<ContentStructure>(), fld);
+						cs.contents.add(new_variable_cs);
+						System.out.println(spaces+fld.name()+" is a PrimitiveValue. Its type is IntegerValue, with a value of: "+pv.intValue());
+					}
+					if (ob.getValue(fld) instanceof LongValue){
+						ContentStructure new_variable_cs = new ContentStructure(fld.type().name(), ""+pv.longValue(), pv.type().toString(), (long)fld.hashCode(), 0l, new ArrayList<ContentStructure>(), fld);
+						cs.contents.add(new_variable_cs);
+						System.out.println(spaces+fld.name()+" is a PrimitiveValue. Its type is LongValue, with a value of: "+pv.longValue());
+					}
+					if (ob.getValue(fld) instanceof ShortValue){
+						ContentStructure new_variable_cs = new ContentStructure(fld.type().name(), ""+pv.shortValue(), pv.type().toString(), (long)fld.hashCode(), 0l, new ArrayList<ContentStructure>(), fld);
+						cs.contents.add(new_variable_cs);
+						System.out.println(spaces+fld.name()+" is a PrimitiveValue. Its type is ShortValue, with a value of: "+pv.shortValue());
+					}
+					if (ob.getValue(fld) instanceof VoidValue){
+						ContentStructure new_variable_cs = new ContentStructure(fld.type().name(), "VOID", pv.type().toString(), (long)fld.hashCode(), 0l, new ArrayList<ContentStructure>(), fld);
+						cs.contents.add(new_variable_cs);
+						System.out.println(spaces+fld.name()+" is a PrimitiveValue. Its type is VoidValue, and is...VOID");
+					}						
 				}
 			}
 		}
