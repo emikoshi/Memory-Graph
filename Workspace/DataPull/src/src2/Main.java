@@ -42,8 +42,11 @@ import com.mxgraph.view.mxGraph;
 
 public class Main {
 	
-	//Make sure to compile before, running the JVM
-	//java -Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n <Classname>
+	// Make sure to compile before, running the JVM
+	// java -Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n <Classname>
+	
+	// http://www.jgraph.org/forum/viewtopic.php?f=13&t=5344
+	
 	
 	public static void main (String args[]) {
 		//get the virtual machine from create_vm with the specified parameters

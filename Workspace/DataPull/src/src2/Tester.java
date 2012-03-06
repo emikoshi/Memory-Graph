@@ -4,11 +4,16 @@ import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
+import com.mxgraph.layout.mxCompactTreeLayout;
+import com.mxgraph.model.mxGraphModel;
+import com.mxgraph.model.mxIGraphModel;
+
 public class Tester {
 	public static void main(String args[]) {
 		ContentStructure test = RandomContentStructures();
 		//Main.print_content_structure(test, "");
 		Grapher frame = new Grapher(test);
+
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(1000, 900);
 		frame.setVisible(true);

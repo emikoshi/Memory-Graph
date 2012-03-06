@@ -5,6 +5,9 @@ import java.util.HashSet;
 import javax.swing.JFrame;
 
 
+import com.mxgraph.layout.mxCompactTreeLayout;
+import com.mxgraph.model.mxGraphModel;
+import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
 import com.sun.jdi.Value;
@@ -23,9 +26,13 @@ public class Grapher extends JFrame {
 		
 		this.cs = cs;
 		
-		mxGraph graph = new mxGraph();
+		//mxGraph graph = new mxGraph();
+		//Object parent = graph.getDefaultParent();
+		mxIGraphModel model = new mxGraphModel();
+		final mxGraph graph = new mxGraph(model);
 		Object parent = graph.getDefaultParent();
-		
+		final mxCompactTreeLayout m = new mxCompactTreeLayout(graph, false);
+		final mxGraphComponent graphComponent = new mxGraphComponent(graph);
 		
 		try
 		{
@@ -43,8 +50,9 @@ public class Grapher extends JFrame {
 			graph.getModel().endUpdate();                        
 		}
 
-		mxGraphComponent graphComponent = new mxGraphComponent(graph);
-		getContentPane().add(graphComponent);            
+		//mxGraphComponent graphComponent = new mxGraphComponent(graph);
+		getContentPane().add(graphComponent);         
+		m.execute(parent);
 	}
 
 //	private int count_stacks() {
