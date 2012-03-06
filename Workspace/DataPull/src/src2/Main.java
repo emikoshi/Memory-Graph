@@ -77,16 +77,6 @@ public class Main {
 		//Create a list of AttachingConnectors to choose which one to connect to 
 		List<AttachingConnector> attaching_connectors_list = CreateBoot.attachingConnectors();
 		
-		//Commented this out because it was purely used for debugging. Its purpose
-		//was to display the AttachingConnectors list to see what connector we should use.
-		//List<Connector> connectors_list = CreateBoot.allConnectors();
-		//System.out.println("attachingConnectors / their names");
-		//for (AttachingConnector i:attaching_connectors_list) System.out.println(i + " \n name: " + i.name());
-		//System.out.println();
-		//System.out.println("allConnectors / their names");
-		//for (Connector i:connectors_list) System.out.println(i + " \n name: " + i.name());
-		//System.out.println();
-		
 		
 		//This is used in order to attach to the SocketAttach Connector
 		for (AttachingConnector i:attaching_connectors_list) {
@@ -123,39 +113,10 @@ public class Main {
 		return null;
 	}
 	
-//Commented the print of this function out in main because it was used to get the raw values
-//of the VM, but really only needed for debugging.
-	private static void print_vm_contents(VirtualMachine target_vm) {
-		// TODO Auto-generated method stub
-		System.out.println("Now printing all threads..");
-		for (ThreadReference i:target_vm.allThreads()) {
-			i.suspend();			
-			if (!(i.name().equals("Reference Handler") || i.name().equals("Finalizer") || i.name().equals("Signal Dispatcher"))) {
-				System.out.println(i);
-				try {
-					for (StackFrame j:i.frames()) {
-						System.out.println("    " +j.location());
-						try {
-							for (LocalVariable k:j.visibleVariables()) {
-								System.out.println("        " + k.typeName() + " " + k.name() + " = " + j.getValue(k));
-							}
-						} catch (AbsentInformationException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-				} catch (IncompatibleThreadStateException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			} else {
-				System.out.println("ignoring basic java thread: " + i);
-			}
-		}
-	}
-	
 	//This method returns a ContentStructure containing all of the threads, stacks, and variables within this program
 	//Possible problems: infinite loop if there is a cycle in the graph (a sequence of nodes that point to each other).
+	// virtualmachine target_vm is being passed in 
+	
 	private static ContentStructure store_vm_contents(VirtualMachine target_vm) {
 		ContentStructure head = new ContentStructure("Base", null, "head", 0l, 0l, new ArrayList<ContentStructure>(), target_vm);
 		
@@ -186,52 +147,11 @@ public class Main {
 								if (v instanceof PrimitiveValue){	
 									PrimitiveValue pv = null;
 									pv = ((PrimitiveValue) v);
-																													
-									if (pv instanceof BooleanValue){
-										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.booleanValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
-										new_stack_cs.contents.add(new_variable_cs);
-										System.out.println(k.name()+" is a PrimitiveValue. Its type is BooleanValue, with a value of: "+pv.booleanValue());
-									}
-									if (pv instanceof ByteValue){
-										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.byteValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
-										new_stack_cs.contents.add(new_variable_cs);
-										System.out.println(k.name()+" is a PrimitiveValue. Its type is ByteValue, with a value of: "+pv.byteValue());
-									}
-									if (pv instanceof CharValue){
-										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.charValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
-										new_stack_cs.contents.add(new_variable_cs);
-										System.out.println(k.name()+" is a PrimitiveValue. Its type is CharValue, with a value of: "+pv.charValue());
-									}
-									if (pv instanceof DoubleValue){
-										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.doubleValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
-										new_stack_cs.contents.add(new_variable_cs);
-										System.out.println(k.name()+" is a PrimitiveValue. Its type is DoubleValue, with a value of: "+pv.doubleValue());
-									}
-									if (pv instanceof FloatValue){
-										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.floatValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
-										new_stack_cs.contents.add(new_variable_cs);
-										System.out.println(k.name()+" is a PrimitiveValue. Its type is FloatValue, with a value of: "+pv.floatValue());
-									}
-									if (pv instanceof IntegerValue){
-										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.intValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
-										new_stack_cs.contents.add(new_variable_cs);
-										System.out.println(k.name()+" is a PrimitiveValue. Its type is IntegerValue, with a value of: "+pv.intValue());
-									}
-									if (pv instanceof LongValue){
-										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.longValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
-										new_stack_cs.contents.add(new_variable_cs);
-										System.out.println(k.name()+" is a PrimitiveValue. Its type is LongValue, with a value of: "+pv.longValue());
-									}
-									if (pv instanceof ShortValue){
-										ContentStructure new_variable_cs = new ContentStructure(k.name(), ""+pv.shortValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
-										new_stack_cs.contents.add(new_variable_cs);
-										System.out.println(k.name()+" is a PrimitiveValue. Its type is ShortValue, with a value of: "+pv.shortValue());
-									}
-									if (pv instanceof VoidValue){
-										ContentStructure new_variable_cs = new ContentStructure(k.name(), "VOID", pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
-										new_stack_cs.contents.add(new_variable_cs);
-										System.out.println(k.name()+" is a PrimitiveValue. Its type is VoidValue, and is...VOID");
-									}	
+															
+									// check instanceof primitive
+									// add to the cs
+									ContentStructure new_variable_cs = check_isntanceof_primitives(pv, k);
+									new_stack_cs.contents.add(new_variable_cs);									
 								}
 								//It checks for an instance of Object reference
 								//prints the type as well as the unique ID for each variable 
@@ -428,4 +348,43 @@ public class Main {
 			}
 		}
 	}
+	public static ContentStructure check_isntanceof_primitives(PrimitiveValue pv, LocalVariable k) {
+		if (pv instanceof BooleanValue){
+			System.out.println(k.name()+" is a PrimitiveValue. Its type is BooleanValue, with a value of: "+pv.booleanValue());		
+			return new ContentStructure(k.name(), ""+pv.booleanValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);			
+		}
+		if (pv instanceof ByteValue){
+			System.out.println(k.name()+" is a PrimitiveValue. Its type is ByteValue, with a value of: "+pv.byteValue());
+			return new ContentStructure(k.name(), ""+pv.byteValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
+		}
+		if (pv instanceof CharValue){
+			System.out.println(k.name()+" is a PrimitiveValue. Its type is CharValue, with a value of: "+pv.charValue());
+			return new ContentStructure(k.name(), ""+pv.charValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);		
+		}
+		if (pv instanceof DoubleValue){
+			System.out.println(k.name()+" is a PrimitiveValue. Its type is DoubleValue, with a value of: "+pv.doubleValue());
+			return new ContentStructure(k.name(), ""+pv.doubleValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);		
+		}
+		if (pv instanceof FloatValue){
+			System.out.println(k.name()+" is a PrimitiveValue. Its type is FloatValue, with a value of: "+pv.floatValue());
+			return new ContentStructure(k.name(), ""+pv.floatValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);		
+		}
+		if (pv instanceof IntegerValue){
+			System.out.println(k.name()+" is a PrimitiveValue. Its type is IntegerValue, with a value of: "+pv.intValue());
+			return new ContentStructure(k.name(), ""+pv.intValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);		
+		}
+		if (pv instanceof LongValue){
+			System.out.println(k.name()+" is a PrimitiveValue. Its type is LongValue, with a value of: "+pv.longValue());
+			return new ContentStructure(k.name(), ""+pv.longValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);		
+		}
+		if (pv instanceof ShortValue){		
+			System.out.println(k.name()+" is a PrimitiveValue. Its type is ShortValue, with a value of: "+pv.shortValue());
+			return new ContentStructure(k.name(), ""+pv.shortValue(), pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
+		}
+		if (pv instanceof VoidValue){		
+			System.out.println(k.name()+" is a PrimitiveValue. Its type is VoidValue, and is...VOID");
+			return new ContentStructure(k.name(), "VOID", pv.type().toString(), (long)k.hashCode(), 0l, new ArrayList<ContentStructure>(), k);
+		}
+		return null;
+	}	
 }
