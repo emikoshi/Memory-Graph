@@ -1,0 +1,45 @@
+//used to get the raw values
+//of the VM, but really only needed for debugging.
+//	private static void print_vm_contents(VirtualMachine target_vm) {
+//		// TODO Auto-generated method stub
+//		System.out.println("Now printing all threads..");
+//		for (ThreadReference i:target_vm.allThreads()) {
+//			i.suspend();			
+//			if (!(i.name().equals("Reference Handler") || i.name().equals("Finalizer") || i.name().equals("Signal Dispatcher"))) {
+//				System.out.println(i);
+//				try {
+//					for (StackFrame j:i.frames()) {
+//						System.out.println("    " +j.location());
+//						try {
+//							for (LocalVariable k:j.visibleVariables()) {
+//								System.out.println("        " + k.typeName() + " " + k.name() + " = " + j.getValue(k));
+//							}
+//						} catch (AbsentInformationException e) {
+//							// TODO Auto-generated catch block
+//							e.printStackTrace();
+//						}
+//					}
+//				} catch (IncompatibleThreadStateException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			} else {
+//				System.out.println("ignoring basic java thread: " + i);
+//			}
+//		}
+//	}
+
+
+
+within create_vm
+		//Commented this out because it was purely used for debugging. Its purpose
+		//was to display the AttachingConnectors list to see what connector we should use.
+		//List<Connector> connectors_list = CreateBoot.allConnectors();
+		//System.out.println("attachingConnectors / their names");
+		//for (AttachingConnector i:attaching_connectors_list) System.out.println(i + " \n name: " + i.name());
+		//System.out.println();
+		//System.out.println("allConnectors / their names");
+		//for (Connector i:connectors_list) System.out.println(i + " \n name: " + i.name());
+		//System.out.println();
+		
+		
