@@ -29,7 +29,7 @@ public class Grapher extends JFrame {
 	private static final long serialVersionUID = 1L;
 	public Grapher(ContentStructure cs)
 	{		
-		super("Hello, World!");
+		super("Memory Graph");
 		
 		this.cs = cs;
 		
@@ -51,8 +51,8 @@ public class Grapher extends JFrame {
 				HashSet<ContentStructure> seen = new HashSet<ContentStructure>();
 				HashMap<ContentStructure, Object> graph_map = new HashMap<ContentStructure, Object>();
 				
-				dfs(parent, null, graph, i, 1, 1, seen, graph_map);
-				System.out.println("done.");
+				dfs(parent, null, null, graph, i, 1, 1, seen, graph_map);
+				//System.out.println("done.");
 			}
 			
 		}
@@ -84,23 +84,26 @@ public class Grapher extends JFrame {
 	// x -- x coordinate
 	// y -- y coordinate
 	
-	private void dfs(Object defaultParent, Object parent, mxGraph graph, ContentStructure cs, double x, double y, HashSet<ContentStructure> seen, HashMap<ContentStructure, Object> gm) {	
+	private void dfs(Object defaultParent, Object parent, ContentStructure parent_cs, mxGraph graph, ContentStructure cs, double x, double y, HashSet<ContentStructure> seen, HashMap<ContentStructure, Object> gm) {	
 		Object newParent;
 		// create a new parent, this is the new node we will now insert into the graph
 		if (cs.type.equals("thread")) {			
 			newParent = graph.insertVertex(defaultParent, null, (cs.type.length() >= 30 ? cs.type.substring(0,30) : cs.type), 1, (720/2 - (150/2)), 150, 30, "fillColor=#7F15CB;fontColor=white", false);
 			gm.put(cs, newParent);
 		} else if(cs.type.equals("stack_frame")) {
-			newParent = graph.insertVertex(defaultParent, null, (cs.type.length() >= 30 ? cs.type.substring(0,30) : cs.type), 160+x, y, 150, 30, "fillColor=#F4EC80;", false);
+			newParent = graph.insertVertex(defaultParent, null, (cs.name.length() >= 30 ? cs.name.substring(0,30) : cs.name), 160+x, y, 190, 30, "fillColor=#F4EC80;", false);
 			gm.put(cs, newParent);
 		} else {
-			newParent = graph.insertVertex(defaultParent, null, (cs.type.length() >= 30 ? cs.type.substring(0,30) : cs.type), 350+x, y, 100, 25, "fillColor=#80B1F4;", false);
+			newParent = graph.insertVertex(defaultParent, null, (cs.type.length() >= 30 ? cs.type.substring(0,30) : cs.type), 350+x, y, 200, 25, "fillColor=#80B1F4;", false);
 			gm.put(cs, newParent);
 		}
 		
 		// if the parent isn't null, insert an edge between the parent and newParent
-		if (parent != null) graph.insertEdge(defaultParent, null, (cs.name.length() >= 30 ? cs.name.substring(0,30) : cs.name), parent, newParent);
 		
+		if (parent != null) {//graph.insertEdge(defaultParent, null, (cs.name.length() >= 30 ? cs.name.substring(0,30) : cs.name), parent, newParent);
+			String pname = parent_cs.names.get(parent_cs.contents.indexOf(cs));
+			graph.insertEdge(defaultParent, null, (pname.length() >= 30 ? pname.substring(0,30) : pname), parent, newParent);
+		}
 		// right now our position calculation sets x and y to 0.
 		double x_pos = 0, y_pos = 0;
 		
@@ -108,43 +111,45 @@ public class Grapher extends JFrame {
 		int count = 0;
 		
 		if (cs.type.equals("thread")) {
-			System.out.println("There are " + cs.contents.size() + " stacks");
+			//System.out.println("There are " + cs.contents.size() + " stacks");
 		}
 		if (cs.contents.size() > 20) {
 			newParent = graph.insertVertex(defaultParent, null, (cs.type.length() >= 30 ? cs.type.substring(0,30) : cs.type)+"(...)", 350+x, y, 100, 25, "fillColor=#80B1F4;", false);
 			gm.put(cs, newParent);
-			graph.insertEdge(defaultParent, null, "", parent, newParent);
+			graph.insertEdge(defaultParent, null, parent_cs.names.get(parent_cs.contents.indexOf(cs)), parent, newParent);
 		} else {
+			int nameIndex = 0;
 			for (ContentStructure current_cs:cs.contents) {
 				if (current_cs.type.equals("stack_frame")) {	
-					//System.out.println("Stack: " + current_cs.name + " value=" + cs.value + "type=" + cs.type + "hashcode=" + cs.hashCode());
+					////System.out.println("Stack: " + current_cs.name + " value=" + cs.value + "type=" + cs.type + "hashcode=" + cs.hashCode());
 					if (seen.contains(current_cs)) {
-						//System.out.println("there is a cycle .. drawing the edge only.");
+						////System.out.println("there is a cycle .. drawing the edge only.");
 						
 						// draw edge
 					} else {
 						seen.add(current_cs);
-						dfs(defaultParent, newParent, graph, current_cs, x, (720/cs.contents.size())*count + 5, seen, gm);						
+						dfs(defaultParent, newParent, cs, graph, current_cs, x, (720/cs.contents.size())*count + 5, seen, gm);						
 					}
 					count++;
 				}
 				
 				if (!(current_cs.type.equals("stack_frame") || current_cs.type.equals("thread"))) {
-					System.out.println("Now graphing " + current_cs.name + " type=" + current_cs.type + ", size=" + current_cs.contents.size() + "hashcode=" + cs.hashCode());
+					//System.out.println("Now graphing " + current_cs.name + " type=" + current_cs.type + ", size=" + current_cs.contents.size() + "hashcode=" + cs.hashCode());
 					if (seen.contains(current_cs)) {
-						System.out.println("we are in: " + current_cs.name + " and there is a cycle .. drawing the edge only.");
-						graph.insertEdge(defaultParent, null, "", newParent, gm.get(current_cs));
-						System.out.println(gm);
+						System.out.println("we are in: " + current_cs.name + " and there is a cycle .. drawing the edge between " + cs.name + " and " + current_cs.name);
+						graph.insertEdge(defaultParent, null, cs.names.get(nameIndex), newParent, gm.get(current_cs));
+						//System.out.println(gm);
 						// draw edge
 					} else {
 						seen.add(current_cs);
-						dfs(defaultParent, newParent, graph, current_cs, x+x_pos, y+y_pos, seen, gm);						
+						dfs(defaultParent, newParent, cs, graph, current_cs, x+x_pos, y+y_pos, seen, gm);						
 					}
 					
 					x_pos += 115;
 					y_pos += 35;
 				}
 				else y_pos+=45;
+				nameIndex++;
 			}
 		}
 	}

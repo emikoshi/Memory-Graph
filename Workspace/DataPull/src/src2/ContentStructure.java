@@ -15,6 +15,7 @@ public class ContentStructure {
 	long id;
 	long uid;
 	ArrayList<ContentStructure> contents;
+	ArrayList<String> names = new ArrayList<String>();
 	Object original;
 	
 	public ContentStructure(String n, String v, String t, long i,long ui, ArrayList<ContentStructure> c, Object o) {
@@ -26,5 +27,9 @@ public class ContentStructure {
 		this.contents = c;
 		this.original = o;
 	}
-	
+
+	public void addLink(ContentStructure c, String n) {
+		contents.add(c);
+		names.add(n);
+	}
 }

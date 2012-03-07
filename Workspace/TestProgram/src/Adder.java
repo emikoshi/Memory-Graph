@@ -25,7 +25,7 @@ public class Adder {
 		cs.contents.add(cs2);
 		cs2.contents.add(cs);
 		cs2.contents.add(new ContentStructure("test32", "te3s2t", "te23st", 32, 231, new ArrayList<ContentStructure>(), null));
-		
+		cs2.contents.add(cs);
 		System.out.println(z);
 		System.in.read();
 		
