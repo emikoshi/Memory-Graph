@@ -136,7 +136,7 @@ public class Grapher extends JFrame {
 				if (!(current_cs.type.equals("stack_frame") || current_cs.type.equals("thread"))) {
 					//System.out.println("Now graphing " + current_cs.name + " type=" + current_cs.type + ", size=" + current_cs.contents.size() + "hashcode=" + cs.hashCode());
 					if (seen.contains(current_cs)) {
-						System.out.println("we are in: " + current_cs.name + " and there is a cycle .. drawing the edge between " + cs.name + " and " + current_cs.name);
+						System.out.println("we are in: " + current_cs.name + " and there is a cycle .. drawing the edge between " + cs.name + " and " + cs.names.get(nameIndex));
 						graph.insertEdge(defaultParent, null, cs.names.get(nameIndex), newParent, gm.get(current_cs));
 						//System.out.println(gm);
 						// draw edge
